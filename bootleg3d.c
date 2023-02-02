@@ -381,6 +381,7 @@ void b3d_look_at(float x, float y, float z) {
 
 int b3d_to_screen(float x, float y, float z, int * sx, int * sy) {
     b3d_vec_t p = { x, y, z, 1 };
+    p = b3d_mat_mul_vec(b3d_model, p);
     p = b3d_mat_mul_vec(b3d_view, p);
     p = b3d_mat_mul_vec(b3d_proj, p);
     p = b3d_vec_div(p, p.w);
