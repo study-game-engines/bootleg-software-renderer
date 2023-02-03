@@ -19,9 +19,9 @@ void b3d_rotate_z(float angle);
 void b3d_scale(float x, float y, float z);
 void b3d_set_camera(float x, float y, float z, float yaw, float pitch, float roll);
 void b3d_look_at(float x, float y, float z);
-int b3d_to_screen(float x, float y, float z, int * sx, int * sy);
+int b3d_to_screen(float x, float y, float z, int * sx, int * sy); // returns 1 if in front of camera
 void b3d_set_fov(float fov_in_degrees);
-void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c);
+int b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c); // returns 1 if rendered
 
 // You can also access these, but best to only read from them.
 extern int b3d_width, b3d_height;
@@ -275,7 +275,7 @@ void b3d_rasterise(float ax, float ay, float az, float bx, float by, float bz, f
     Public API
 */
 
-void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c) {
+int b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c) {
     b3d_triangle_t t = (b3d_triangle_t){{{ax,ay,az,1},{bx,by,bz,1},{cx,cy,cz,1}}};
     t.p[0] = b3d_mat_mul_vec(b3d_model, t.p[0]);
     t.p[1] = b3d_mat_mul_vec(b3d_model, t.p[1]);
@@ -285,7 +285,7 @@ void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, fl
     b3d_vec_t line_b = b3d_vec_sub(t.p[2], t.p[0]);
     b3d_vec_t normal = b3d_vec_cross(line_a, line_b);
     b3d_vec_t cam_ray = b3d_vec_sub(t.p[0], b3d_camera);
-    if (b3d_vec_dot(normal, cam_ray) > 0.01f) return;
+    if (b3d_vec_dot(normal, cam_ray) > 0.01f) return 0;
     #endif
     t.p[0] = b3d_mat_mul_vec(b3d_view, t.p[0]);
     t.p[1] = b3d_mat_mul_vec(b3d_view, t.p[1]);
@@ -297,6 +297,7 @@ void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, fl
         t,
         clipped
     );
+    if (count == 0) return 0;
     b3d_triangle_t queue[16];
     int queue_count = 0;
     for (int n = 0; n < count; ++n) {
@@ -353,6 +354,7 @@ void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, fl
             c
         );
     }
+    return 1;
 }
 
 void b3d_reset() { b3d_model = b3d_mat_ident(); }

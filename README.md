@@ -34,7 +34,7 @@ void b3d_rotate_z(float angle);
 void b3d_scale(float x, float y, float z);
 void b3d_set_camera(float x, float y, float z, float yaw, float pitch, float roll);
 void b3d_look_at(float x, float y, float z);
-int b3d_to_screen(float x, float y, float z, int * sx, int * sy); // returns 0 if behind camera
+int b3d_to_screen(float x, float y, float z, int * sx, int * sy); // returns 1 if in front of camera
 void b3d_set_fov(float fov_in_degrees);
-void b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c);
+int b3d_triangle(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, uint32_t c); // returns 1 if rendered
 ```
